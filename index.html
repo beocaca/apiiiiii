@@ -1,0 +1,70 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <title> Hi Nam</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="src/index.scss">
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="js/main.js"></script>
+  <!--  <script src ="js/faker.js" type = "text/javascript"></script>-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js"
+          integrity="sha512-/seDHxVfh1NvFUscAj8GsHQVZJvr2jjAoYsNL7As2FCaFHUHYIarl3sRCvVlFgyouVNiRgHIebyLKjpgd1SLDw=="
+          crossorigin="anonymous"></script>
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+<br>
+
+<div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <div>
+      <div>
+        <label> Name Group <span style="color: red">*</span> : </label>
+        <input type="text" name="groupEdit">
+      </div>
+      <button type="" id="save"> Save</button>
+    </div>
+  </div>
+</div>
+
+<div style="padding: 20px; max-width: 400px; width: 100%;">
+  <form onsubmit="addGroup(); return false;" id="aaa">
+    <fieldset>
+      <legend>Groups Form:</legend>
+      </br>
+      <label> Name Group <span style="color: #ff0000">*</span> : </label>
+      <br/>
+      <input faker-attr="company.companyName" data-field="name"
+             style="width: 100%" placeholder="15 chars" type="text" name="name"/>
+      <div class="err-mess">
+        <span err="name"></span>
+      </div>
+      <input type="submit" value="Add Group">
+      <button onclick="initFakerOfForm()" type="button"> Random Name</button>
+    </fieldset>
+  </form>
+
+</div>
+<div id="pages-number">
+
+</div>
+<ul id="group-block">
+
+</ul>
+<script>
+  window.onload = function () {
+    initFakerOfForm()
+
+    getApi(1)
+  }
+</script>
+
+</body>
+
+</html>

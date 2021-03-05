@@ -1,0 +1,169 @@
+<!doctype html>
+<html class="no-js" lang="" xmlns="http://www.w3.org/1999/html">
+
+<head>
+  <meta charset="utf-8">
+  <title> Hi Detail</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="src/index.scss">
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+  <!--  <script src="js/faker.js" type="text/javascript"></script>-->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js"
+          integrity="sha512-/seDHxVfh1NvFUscAj8GsHQVZJvr2jjAoYsNL7As2FCaFHUHYIarl3sRCvVlFgyouVNiRgHIebyLKjpgd1SLDw=="
+          crossorigin="anonymous"></script>
+
+  <script src="js/main.js"></script>
+  <meta name="theme-color" content="#fafafa">
+</head>
+<body>
+
+<div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+
+    <form onsubmit="editUser(showFormEditOf()['idGroup'],showFormEditOf()['idUser']); return false;" id="aaa">
+      <fieldset>
+        <legend>User Edit Form:</legend>
+
+        </br>
+        <label> First Name <span style="color: red">*</span> : </label>
+        <br/>
+        <input style="width: 100%" placeholder="15 chars" type="text"
+               name="firstNameUser1"/>
+        <div class="err-mess">
+          <span err="first_name1"></span>
+        </div>
+
+        <div style="margin-bottom: 10px;"></div>
+
+        <label> Last Name <span style="color: red">*</span> : </label>
+        <br/>
+        <input style="width: 100%;" placeholder="15 chars" type="text"
+               name="lastNameUser"/>
+        <br/>
+        <div class="err-mess">
+          <span err="last_name1"></span>
+        </div>
+        <div style="margin-bottom: 10px;"></div>
+
+        <label> Email <span style="color: red">*</span> : </label>
+
+        <br/>
+
+        <input style="width: 100%;" type="email"
+               name="emailUser"/>
+        <div class="err-mess">
+          <span err="email1"></span>
+        </div>
+        <div style="margin-bottom: 10px;"></div>
+        <label for="avatar" style="cursor:pointer;"> Avatar :
+          <img src="https://toppng.com/uploads/preview/roger-berry-avatar-placeholder-11562991561rbrfzlng6h.png"
+               style="-moz-border-radius: 50px;border-radius: 50px;height: 80px"
+               id="imgedit">
+        </label>
+
+        <input class="hidden" style="" type="file" multiple id="avatar1" name="avatarUser1"/>
+        <br>
+
+        <input type="submit" value="Save">
+
+<!--
+        <button type="button" onclick="initFakerOfForm()">Random User</button>
+-->
+
+      </fieldset>
+    </form>
+
+  </div>
+</div>
+
+<div style="padding: 20px; max-width: 400px; width: 100%;">
+  <form onsubmit="addUser(); return false;" id="xxxxx">
+    <fieldset>
+      <legend>User Form:</legend>
+      </br>
+      <label> First Name <span style="color: red">*</span> : </label>
+      <br/>
+
+      <input faker-attr="name.firstName" data-field="first_name"
+
+             style="width: 100%" placeholder="15 chars" type="text" name="firstNameUser"/>
+
+      <div class="err-mess">
+        <span err="first_name"></span>
+      </div>
+      <div style="margin-bottom: 10px;"></div>
+
+      <label> Last Name <span style="color: red">*</span> : </label>
+
+      <br/>
+      <input faker-attr="name.lastName" data-field="last_name" style="width: 100%;" placeholder="15 chars" type="text"
+             name="lastNameUser"/>
+      <br/>
+      <!--
+
+          <label> Full Name <span style="color: red">*</span> : </label>
+          <br/>
+          <input faker-attr="name.findName" style="width: 100%;" placeholder="15 chars" type="text" name="lastNameUfdsfdsser"/>
+      -->
+
+      <div class="err-mess">
+        <span err="last_name"></span>
+      </div>
+      <div style="margin-bottom: 10px;"></div>
+
+      <label> Email <span style="color: red">*</span> : </label>
+
+      <br/>
+
+      <input faker-attr="internet.exampleEmail" style="width: 100%;" value="example@email.zxc"
+             placeholder="example@email.zxc"
+             type="email" data-field="email"
+             name="emailUser"/>
+      <div class="err-mess">
+        <span err="email"></span>
+      </div>
+      <div style="margin-bottom: 10px;"></div>
+      <label for="avatar" style="cursor:pointer;"> Avatar :
+        <img src="https://toppng.com/uploads/preview/roger-berry-avatar-placeholder-11562991561rbrfzlng6h.png"
+             style="-moz-border-radius: 50px;border-radius: 50px;height: 80px"
+             id="imgupload">
+      </label>
+
+      <input class="hidden" data-field="avatar"
+             style="" type="file" multiple id="avatar" name="avatarUser"/>
+      <div class="err-mess">
+        <span err="avatar"></span>
+      </div>
+      <br>
+      <!--      <button id="addUser" type="submit">Add</button>-->
+      <input type="submit" value="Add">
+      <button type="button" onclick="initFakerOfForm()">Random User</button>
+
+    </fieldset>
+  </form>
+</div>
+
+<div id="pages-number">
+
+</div>
+<div id="empty" style="color: red;font-size: 50px;text-align: center">
+  Empty User
+</div>
+<ul id="detail">
+
+
+</ul>
+<script>
+  window.onload = function () {
+    initFakerOfForm()
+    previewImg()
+    run()
+  }
+</script>
+
+</body>
