@@ -1,5 +1,5 @@
 const axios = require('axios').default;
-
+const avatarDefault = 'https://toppng.com/uploads/preview/roger-berry-avatar-placeholder-11562991561rbrfzlng6h.png'
 var api = 'https://satlegal.ebitc.com/api/dummies/groups'
 
 var listPage = []
@@ -231,18 +231,32 @@ window.previewImg = function previewImg() {
       FR.onload = function (e) {
         document.getElementById("imgupload").src = e.target.result;
         document.getElementById("imgupload").style.width = "80px";
+      };
+      FR.readAsDataURL(this.files[0]);
+    }
+  }
 
+  function readFile1() {
+    if (this.files && this.files[0]) {
+      var FR = new FileReader();
+      FR.onload = function (e) {
+        document.getElementById("imgupload1").style.width = "80px";
+        document.getElementById("imgupload1").src = e.target.result;
       };
       FR.readAsDataURL(this.files[0]);
     }
   }
 
   document.getElementById("avatar").addEventListener("change", readFile, false);
-
+  document.getElementById("avatar1").addEventListener("change", readFile1, false);
 }
+
 
 function renderUsers(listUser) {
   var htmls = listUser.map(e => {
+    var strUser1 = "'21s'"
+    var strUser = '"' + JSON.stringify(e) + '"'
+    // strUser = strUser.toString()
     var srcAvatar = e.avatar ? e.avatar : ''
     return `<li>
 <h4> id : ${e.id}</h4>
@@ -251,7 +265,7 @@ function renderUsers(listUser) {
 <h2>Last Name : ${e.last_name} </a></h2>
 <h3>Email: ${e.email}</h3>
 <button onclick="delUser(${getGroupId()},${e.id})"> Del</button>
-<button type="button" onclick="showFormEditOf(${getGroupId()},${e.id})"> Show Form Edit</button>
+<button type="button" onclick="showFormEdit(${getGroupId()},${e.id})"> Show Form Edit</button>
 </li>`
   })
   document.querySelector('#detail').innerHTML = htmls.join('')
@@ -322,28 +336,28 @@ function addUser(evt) {
 
 window.addUser = addUser;
 
-function renderErrorOfForm(errors) {
+function renderErrorOfForm(errors, attrName = 'err') {
   var errkeys = Object.keys(errors) // [first_name]
   errkeys.forEach(k => {
     var mess = errors[k].join()
-    document.querySelector(`[err=${k}]`).textContent = mess
+    document.querySelector(`[${attrName}=${k}]`).textContent = mess
     // document.querySelector(`[err=first_name]`).textContent = mess
   })
 }
 
-function removeMessErr() {
-  var allMess = document.querySelectorAll('[err]')
+function removeMessErr(attrErrName = 'err') {
+  var allMess = document.querySelectorAll(`[${attrErrName}]`)
   allMess.forEach(elm => elm.textContent = '')
 }
 
-function getFieldValueOfForm() {
-  var allFieldElm = document.querySelectorAll('[data-field]')
+function getFieldValueOfForm(attrName = 'data-field') {
+  var allFieldElm = document.querySelectorAll(`[${attrName}]`)
 
   var jsonData = {}
   var formData = new FormData()
 
   allFieldElm.forEach(elmInput => {
-    var fieldName = elmInput.getAttribute('data-field')
+    var fieldName = elmInput.getAttribute(`${attrName}`)
 
     if (elmInput.files) {
       var arrFiles = Object.values(elmInput.files)
@@ -411,33 +425,82 @@ window.delUser = function delUser(idGroup, idUser) {
   }
 }
 
-window.showFormEditOf = function showFormEditOf(idGroup, idUser) {
+window.showFormEdit = function showFormEdit(idGroup, idUser) {
+  var user = listUsers.find(u => u.id === idUser)
+
   getModal().style.display = 'block'
-  return a
-}
 
-/*
-function editUser(idGroup, idUser) {
-  var postData = getFieldValueOfForm()
-  var postDataFormData = postData.formData
-  axios.put(`https://satlegal.ebitc.com/api/dummies/groups/${idGroup}/users/${idUser}`,
-    postDataFormData)
-    .then(function (response) {
-      var index = listPage.findIndex(e => {
-        return e.id === id
+  var allUpdateForm = document.querySelectorAll('[data-update]')
+
+  allUpdateForm.forEach(elm => {
+
+    var fieldName = elm.getAttribute('data-update')
+
+    var isFieldFileUpload = elm.hasAttribute('data-file-upload') // if file upload boolean
+    if (isFieldFileUpload) { //neu co attributes data-file-upload thi lam
+      if (document.querySelector(`[data-image=${fieldName}]`)) {
+        //neu co phan mo ta thi moi add SRC dc
+        //<img src = '...'>
+        //file .doc .exl ko add SRC
+        if (user[fieldName]) { //user[fieldName] KHONG la NULL ????
+          document.querySelector(`[data-image=${fieldName}]`).src = user[fieldName]
+        } else {
+          //khi show phai show 1 trong 2
+          //show 1 hoac 2 se ko get dc 1 trong 2
+          document.querySelector(`[data-image=${fieldName}]`).src = avatarDefault
+        }
+      }
+    } else {
+      elm.value = user[fieldName]
+    }
+  })
+
+  console.log(getGroupId(), user)
+
+  window.editUser = function editUser() {
+    var postData = getFieldValueOfForm('data-update')
+
+    var postDataFormData = postData.formData
+
+
+    axios.put(`https://satlegal.ebitc.com/api/dummies/groups/${getGroupId()}/users/${user.id}/`,
+      postDataFormData)
+      .then(function (response) {
+
+        var newUser = response.data
+
+        var index = listUsers.findIndex(e => {
+          return e.id === idUser
+        })
+
+        listUsers[index] = newUser
+
+        checkEmpty(listUsers.length)
+
+        renderUsers(listUsers)
+
+        removeMessErr('errEdit')
+
+        console.log(listUsers);
+
       })
-      listUsers[index] = response.data
 
-      renderApi(listUsers)
+      .catch(function (error) {
 
-      console.log(listUsers)
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+        if (error.response) {
+          var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
+
+          console.log(errors)
+          //removeMessErr first
+          removeMessErr()
+
+          renderErrorOfForm(errors, 'errEdit')
+        }
+      });
+    return false
+  }
 
 }
-*/
 
 
 
