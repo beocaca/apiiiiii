@@ -425,9 +425,11 @@ window.delUser = function delUser(idGroup, idUser) {
   }
 }
 
-window.showFormEdit = function showFormEdit(idGroup, idUser) {
-  var user = listUsers.find(u => u.id === idUser)
+var userEditSelected = null
 
+function showFormEdit(idGroup, idUser) {
+  var findUserEdit = listUsers.find(u => u.id === idUser)
+  userEditSelected = findUserEdit
   getModal().style.display = 'block'
 
   var allUpdateForm = document.querySelectorAll('[data-update]')
@@ -442,8 +444,8 @@ window.showFormEdit = function showFormEdit(idGroup, idUser) {
         //neu co phan mo ta thi moi add SRC dc
         //<img src = '...'>
         //file .doc .exl ko add SRC
-        if (user[fieldName]) { //user[fieldName] KHONG la NULL ????
-          document.querySelector(`[data-image=${fieldName}]`).src = user[fieldName]
+        if (userEditSelected[fieldName]) { //user[fieldName] KHONG la NULL ????
+          document.querySelector(`[data-image=${fieldName}]`).src = userEditSelected[fieldName]
         } else {
           //khi show phai show 1 trong 2
           //show 1 hoac 2 se ko get dc 1 trong 2
@@ -451,57 +453,55 @@ window.showFormEdit = function showFormEdit(idGroup, idUser) {
         }
       }
     } else {
-      elm.value = user[fieldName]
+      elm.value = userEditSelected[fieldName]
     }
   })
-
-  console.log(getGroupId(), user)
-
-  window.editUser = function editUser() {
-    var postData = getFieldValueOfForm('data-update')
-
-    var postDataFormData = postData.formData
-
-
-    axios.put(`https://satlegal.ebitc.com/api/dummies/groups/${getGroupId()}/users/${user.id}/`,
-      postDataFormData)
-      .then(function (response) {
-
-        var newUser = response.data
-
-        var index = listUsers.findIndex(e => {
-          return e.id === idUser
-        })
-
-        listUsers[index] = newUser
-
-        checkEmpty(listUsers.length)
-
-        renderUsers(listUsers)
-
-        removeMessErr('errEdit')
-
-        console.log(listUsers);
-
-      })
-
-      .catch(function (error) {
-
-        if (error.response) {
-          var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
-
-          console.log(errors)
-          //removeMessErr first
-          removeMessErr()
-
-          renderErrorOfForm(errors, 'errEdit')
-        }
-      });
-    return false
-  }
+  console.log(getGroupId(), userEditSelected.id)
 
 }
 
+function editUser() {
+  var postData = getFieldValueOfForm('data-update')
+  var postDataFormData = postData.formData
+  axios.put(`https://satlegal.ebitc.com/api/dummies/groups/${getGroupId()}/users/${userEditSelected.id}/`,
+    postDataFormData)
+    .then(function (response) {
+
+      var newUser = response.data
+
+      var index = listUsers.findIndex(e => {
+        return e.id === userEditSelected.id
+      })
+
+      listUsers[index] = newUser
+
+      checkEmpty(listUsers.length)
+
+      renderUsers(listUsers)
+
+      removeMessErr('errEdit')
+
+      console.log('aaa');
+
+    })
+
+    .catch(function (error) {
+
+      if (error.response) {
+        var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
+
+        console.log(errors)
+        //removeMessErr first
+        removeMessErr()
+
+        renderErrorOfForm(errors, 'errEdit')
+      }
+    });
+  return false
+}
+
+window.showFormEdit = showFormEdit
+window.editUser = editUser
 
 
 
