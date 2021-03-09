@@ -1,105 +1,129 @@
+import 'regenerator-runtime/runtime'
+
 const axios = require('axios').default;
 
 const avatarDefault = 'https://toppng.com/uploads/preview/roger-berry-avatar-placeholder-11562991561rbrfzlng6h.png'
 
-var api = 'https://satlegal.ebitc.com/api/dummies/groups'
-var api1 = 'https://satlegal.ebitc.com/api'
-
-var listPage = []
+var baseUrl = 'https://satlegal.ebitc.com/api'
 
 const perPage = 20
 
-function getApi(page) {
-  axios.get(api + `/?page=${page}`)
-    .then(function (response) {
-      listPage = [...response.data.results]
-
-      listPage.sort((a, b) => {
-        return b.id - a.id
-      })
-
-      var totalPages = calcPagesNumber(response.data.count)
-
-      renderPagesGroup(totalPages, page)
-
-      renderApi(listPage)
-
-      console.log(listPage)
-    })
-    .catch(function (error) {
-      // handle error
-      alert("Invalid Name")
-
-      console.log(error);
-    })
-    .then(function () {
-      console.log(listPage)
-    });
+async function getGroup(page) {
+  var endPoint = `${baseUrl}/dummies/groups/?page=${page}`
+  try {
+    var response = await axios.get(endPoint)
+    var list = [...response.data.results]
+    setListLocal('listGroup', list)
+    var totalPages = calcPagesNumber(response.data.count)
+    renderPagesGroup(totalPages, page)
+    var crrLocalList = getListLocal('listGroup')
+    checkEmpty(crrLocalList.length)
+    renderPage(crrLocalList)
+  } catch (error) {
+    console.log(error);
+  }
 }
 
-function delGroup(id) {
-  if (window.confirm(`Delete ${id} ?`)) {
-    axios.delete(api + '/' + id)
-      .then(function (response) {
+async function delGroup(id) {
+  var endPoint = `${baseUrl}/dummies/groups/${id}`
+  var list = getListLocal('listGroup')
 
-        var indexId = listPage.findIndex(e => {
-          return e.id === id
-        })
+  var indexId = list.findIndex(e => {
+    return e.id === id
+  })
+  var crrGroupSelected = list[indexId]
 
-        listPage.splice(indexId, 1)
+  if (window.confirm(`Delete group: ${crrGroupSelected.name} ?`)) {
+    try {
+      var response = await axios.delete(endPoint)
 
-        renderApi(listPage)
+      list.splice(indexId, 1)
 
-        console.log(listPage)
-      })
-      .catch(function (error) {
-        alert("Invalid Name")
+      setListLocal('listGroup', list)
+      renderPage(list)
+      checkEmpty(list.length)
 
-        // handle error
-        console.log(error);
-      });
+      console.log(response)
+
+    } catch (e) {
+
+    }
   }
+}
+
+async function addGroup() {
+  var postData = getFieldValueOfForm()
+  var postDataFormData = postData.formData
+  var endPoint = `${baseUrl}/dummies/groups/`
+  try {
+    var response = await axios.post(endPoint, postDataFormData)
+    var newGroup = response.data
+    var list = getListLocal('listGroup')
+    list.push(newGroup)
+    removeMessErr()
+    checkEmpty(list.length)
+    setListLocal('listGroup', list)
+    renderPage(list)
+    console.log(list)
+  } catch (error) {
+    if (error.response) {
+      var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
+      console.log(errors)
+      removeMessErr()
+      renderErrorOfForm(errors)
+    }
+  }
+}
+
+var groupId = null
+
+//"groupId" in editGroup
+async function handleSaveEditGroup() {
+  var endPoint = `${baseUrl}/dummies/groups/${groupId}/`
+  try {
+    var dataPost = getFieldValueOfForm('data-update')
+    var dataPostFormData = dataPost.formData
+    var response = await axios.put(endPoint, dataPostFormData)
+    removeMessErr('errEditGroup')
+    var list = getListLocal('listGroup')
+    var index = list.findIndex(e => {
+      return e.id === groupId
+    })
+    list[index] = response.data
+    checkEmpty(list.length)
+    renderPage(list)
+    setListLocal('listGroup', list)
+    console.log(list)
+  } catch (error) {
+    if (error.response) {
+      var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
+      console.log(errors)
+      //removeMessErr first
+      removeMessErr('errEditGroup')
+      renderErrorOfForm(errors, 'errEditGroup')
+    }
+  }
+}
+
+window.handleSaveEditGroup = handleSaveEditGroup
+
+function editGroup(id) {
+  // todo: 1 open modal
+  var modal = getModal()
+  modal.style.display = 'block'
+
+  // todo: 2 init value form
+  groupId = id
+  var list = getListLocal('listGroup')
+  var groupSelected = list.find(e => {
+    return e.id === id
+  })
+  initFormValueWhenEdit(groupSelected, 'data-update')
 }
 
 function getModal() {
   var modal = (document.querySelector('#myModal'))
   return modal
-}
-
-function editGroup(id) {
-  var modal = getModal()
-
-  modal.style.display = 'block'
-
-  var a = listPage.find(e => {
-    return e.id === id
-  })
-
-  var nameInput = document.querySelector('input[name = "groupEdit"]')
-
-  nameInput.value = a.name
-  document.querySelector('#save').onclick = (e) => {
-    var nameNew = validate(nameInput.value)
-    if (nameNew) {
-      axios.put(api + '/' + id, {
-        name: nameNew,
-      })
-        .then(function (response) {
-          var index = listPage.findIndex(e => {
-            return e.id === id
-          })
-          listPage[index] = response.data
-          renderApi(listPage)
-          console.log(listPage)
-        })
-        .catch(function (error) {
-          alert("Already Name, try again")
-          console.log(error);
-        })
-        .then(closeModal)
-    }
-    closeModal()
-  }
 }
 
 function closeModal() {
@@ -114,8 +138,7 @@ function hostUrl() {
   return location.host
 }
 
-function renderApi(list) {
-
+function renderPage(list) {
   var htmls = list.map(e => {
     return `<li>
 <h4> id : ${e.id}</h4>
@@ -133,36 +156,6 @@ function validate(name) {
     return false;
   }
   return name;
-}
-
-function addGroup() {
-
-  var postData = getFieldValueOfForm()
-
-  var postDataFormData = postData.formData
-
-  axios.post(api + '/',
-    postDataFormData)
-    .then(function (response) {
-      var newGroup = response.data
-      listPage.push(newGroup)
-      renderApi(listPage)
-      removeMessErr()
-      console.log(listPage)
-    })
-    .catch(function (error) {
-      if (error.response) {
-        var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
-
-        console.log(errors)
-        //removeMessErr first
-        removeMessErr()
-
-        renderErrorOfForm(errors)
-      }
-
-    });
-
 }
 
 function calcPagesNumber(countTotal) {
@@ -186,7 +179,7 @@ function renderPagesGroup(totalPage, page) {
     if (page === i) {
       cls = 'disabledBtn'
     }
-    htmls += `<button class="${cls}" onclick="getApi(${i})"> Page ${i}</button>`
+    htmls += `<button class="${cls}" onclick="getGroup(${i})"> Page ${i}</button>`
   }
   document.querySelector('#pages-number').innerHTML = htmls
 }
@@ -225,7 +218,6 @@ function initFakerOfForm() {
     var firstKey = arr[0] // => a["name"]
     var lastKey = arr[1] // => a["firstName"]
     var value = faker[firstKey][lastKey]()
-    console.log(value)
     input.value = value
   })
 
@@ -280,48 +272,6 @@ function checkEmpty(totalList) {
   return document.querySelector('#empty').style.display = 'none'
 }
 
-function addUser(evt) {
-
-  var dataPost = getFieldValueOfForm()
-
-  var dataPostFormData = dataPost.formData
-
-  // var dataPostJsonData = dataPost.jsonData
-
-  axios.post(`https://satlegal.ebitc.com/api/dummies/groups/${getGroupId()}/users/`,
-    dataPostFormData)
-    .then(function (response) {
-
-      var newUser = response.data
-      var l = getListUser()
-
-      l.push(newUser)
-
-      checkEmpty(l.length)
-
-      renderUsers(l)
-      setListUser(l)
-      removeMessErr()
-
-      console.log(newUser);
-
-    })
-
-    .catch(function (error) {
-
-      if (error.response) {
-        var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
-
-        console.log(errors)
-        //removeMessErr first
-        removeMessErr()
-
-        renderErrorOfForm(errors, 'err')
-      }
-    });
-  return false
-}
-
 function renderErrorOfForm(errors, attrName = 'err') {
   var errkeys = Object.keys(errors) // [first_name]
   errkeys.forEach(k => {
@@ -364,95 +314,111 @@ function getFieldValueOfForm(attrName = 'data-field') {
   }
 }
 
-function getListUser() {
-  var a = JSON.parse(localStorage.getItem('listUser'))
+function getListLocal(key = 'listUser') {
+  var a = JSON.parse(localStorage.getItem(`${key}`))
   return a
 }
 
-function setListUser(results) {
-  localStorage.setItem('listUser', JSON.stringify(results))
+function setListLocal(key = 'listUser', results) {
+  localStorage.setItem(`${key}`, JSON.stringify(results))
 }
 
-function getUser(page = 1) {
-  axios.get(`https://satlegal.ebitc.com/api/dummies/groups/${getGroupId()}/users/?page=${page}`)
-    .then(function (response) {
-      // listUsers = [...response.data.results]
-      //  listUsers = getListUser() || []
-      setListUser([...response.data.results])
-
-      var totalPages = calcPagesNumber(response.data.count)
-
-      renderPagesUser(totalPages, page)
-
-      checkEmpty(getListUser().length)
-
-      renderUsers(getListUser())
-
-      console.log(getListUser())
-    })
-    .catch(function (error) {
-      // handle error
-      console.log(error);
-    })
-    .then(function () {
-    });
-}
-
-const $ = document
 
 function getCrrUser(id) {
-  var a = getListUser().find(e => {
+  var a = getListLocal('listUser').find(e => {
     return e.id === id
   })
   return a
 }
 
 function getCrrIndexUser(id) {
-  var a = getListUser().findIndex(e => {
+  var a = getListLocal('listUser').findIndex(e => {
     return e.id === id
   })
   return a
 }
 
-function delUser(idGroup, idUser) {
-
-  var a = getCrrUser(idUser)
-
-  if (window.confirm(`Delete User :  ${a.first_name} ${a.last_name} ?`)) {
-    axios.delete(`https://satlegal.ebitc.com/api/dummies/groups/${idGroup}/users/${idUser}`)
-
-      .then(function (response) {
-
-        var indexId = getCrrIndexUser(idUser)
-        var l = getListUser()
-        l.splice(indexId, 1)
-
-        checkEmpty(l.length)
-
-        renderUsers(l)
-        setListUser(l)
-
-        console.log(a)
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+async function getUser(page = 1) {
+  try {
+    var endPoint = `${baseUrl}/dummies/groups/${getGroupId()}/users/?page=${page}`
+    var response = await axios.get(endPoint)
+    setListLocal('listUser', [...response.data.results])
+    var totalPages = calcPagesNumber(response.data.count)
+    renderPagesUser(totalPages, page)
+    checkEmpty(getListLocal('listUser').length)
+    renderUsers(getListLocal('listUser'))
+    console.error('RESPONSE', response)
+  } catch (err) {
+    console.error(err.message)
+  } finally {
   }
 }
 
+async function addUser(evt) {
+  var dataPost = getFieldValueOfForm()
+  var dataPostFormData = dataPost.formData
+  // var dataPostJsonData = dataPost.jsonData
+  var endPoint = `${baseUrl}/dummies/groups/${getGroupId()}/users/`
+  try {
+    var response = await axios.post(endPoint, dataPostFormData)
+    var newUser = response.data
+    var l = getListLocal('listUser')
+    l.push(newUser)
+    checkEmpty(l.length)
+    renderUsers(l)
+    setListLocal('listUser', l)
+    removeMessErr()
+    console.log(newUser);
+    console.error('RESPONSE', response)
+  } catch (error) {
+    if (error.response) {
+      var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
+      console.log(errors)
+      //removeMessErr first
+      removeMessErr()
+      renderErrorOfForm(errors, 'err')
+    }
+  }
+  // return false
+}
+
+async function delUser(idGroup, idUser) {
+  try {
+    var endPoint = `${baseUrl}/dummies/groups/${idGroup}/users/${idUser}`
+    var a = getCrrUser(idUser)
+    if (window.confirm(`Delete User :  ${a.first_name} ${a.last_name} ?`)) {
+      var response = await axios.delete(endPoint)
+      var indexId = getCrrIndexUser(idUser)
+      var l = getListLocal('listUser')
+      l.splice(indexId, 1)
+      checkEmpty(l.length)
+      renderUsers(l)
+      setListLocal('listUser', l)
+      console.error('a', a)
+      console.error('RESPONSE', response)
+    }
+  } catch (err) {
+    console.log(err);
+  } finally {
+  }
+}
+
+//userEditSelected in showFormEdit
 var userEditSelected = null
 
 function showFormEdit(idGroup, idUser) {
-  var a = getCrrUser(idUser)
-
-  userEditSelected = a
+  userEditSelected = getCrrUser(idUser)
   getModal().style.display = 'block'
 
-  var allUpdateForm = document.querySelectorAll('[data-update]')
+  initFormValueWhenEdit(userEditSelected, 'data-update')
+}
+
+function initFormValueWhenEdit(item, attrUpdate = 'data-update') {
+  var allUpdateForm = document.querySelectorAll(`[${attrUpdate}]`)
 
   allUpdateForm.forEach(elm => {
 
-    var fieldName = elm.getAttribute('data-update')
+    var fieldName = elm.getAttribute(attrUpdate)
 
     var isFieldFileUpload = elm.hasAttribute('data-file-upload') // if file upload boolean
     if (isFieldFileUpload) { //neu co attributes data-file-upload thi lam
@@ -460,8 +426,8 @@ function showFormEdit(idGroup, idUser) {
         //neu co phan mo ta thi moi add SRC dc
         //<img src = '...'>
         //file .doc .exl ko add SRC
-        if (userEditSelected[fieldName]) { //user[fieldName] KHONG la NULL ????
-          document.querySelector(`[data-image=${fieldName}]`).src = userEditSelected[fieldName]
+        if (item[fieldName]) { //user[fieldName] KHONG la NULL ????
+          document.querySelector(`[data-image=${fieldName}]`).src = item[fieldName]
         } else {
           //khi show phai show 1 trong 2
           //show 1 hoac 2 se ko get dc 1 trong 2
@@ -469,57 +435,39 @@ function showFormEdit(idGroup, idUser) {
         }
       }
     } else {
-      elm.value = userEditSelected[fieldName]
+      elm.value = item[fieldName]
     }
   })
-  console.log(getGroupId(), userEditSelected.id)
 }
 
-function editUser() {
+async function editUser() {
   var postData = getFieldValueOfForm('data-update')
   var postDataFormData = postData.formData
-  axios.put(`https://satlegal.ebitc.com/api/dummies/groups/${getGroupId()}/users/${userEditSelected.id}/`,
-    postDataFormData)
-    .then(function (response) {
-
-      var newUser = response.data
-
-      var index = getCrrIndexUser(userEditSelected.id)
-      var l = getListUser()
-      l[index] = newUser
-      setListUser(l)
-      checkEmpty(l.length)
-
-      renderUsers(l)
-
+  var endPoint = `${baseUrl}/dummies/groups/${getGroupId()}/users/${userEditSelected.id}/`
+  try {
+    var response = await axios.put(endPoint, postDataFormData)
+    var newUser = response.data
+    var index = getCrrIndexUser(userEditSelected.id)
+    var l = getListLocal('listUser')
+    l[index] = newUser
+    setListLocal('listUser', l)
+    checkEmpty(l.length)
+    renderUsers(l)
+    removeMessErr('errEdit')
+    console.error('RESPONSE', response)
+  } catch (error) {
+    if (error.response) {
+      var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
+      console.log(errors)
+      //removeMessErr first
       removeMessErr('errEdit')
-
-      console.log(l);
-
-    })
-
-    .catch(function (error) {
-
-      if (error.response) {
-        var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
-
-        console.log(errors)
-        //removeMessErr first
-        removeMessErr('errEdit')
-
-        renderErrorOfForm(errors, 'errEdit')
-      }
-    });
-  return false
-}
-
-window.onclick = function (event) {
-  if (event.target === getModal()) {
-    getModal().style.display = "none";
+      renderErrorOfForm(errors, 'errEdit')
+    }
   }
+  // return false
 }
 
-window.getApi = getApi
+window.getGroup = getGroup
 window.editGroup = editGroup
 window.delGroup = delGroup
 window.addGroup = addGroup
@@ -530,6 +478,7 @@ window.showFormEdit = showFormEdit
 window.editUser = editUser
 window.previewImg = previewImg
 window.initFakerOfForm = initFakerOfForm
+window.closeModal = closeModal
 window.run = run
 
 

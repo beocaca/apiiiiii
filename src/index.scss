@@ -2,6 +2,7 @@
   pointer-events: none;
   opacity: 0.4;
 }
+
 #api {
   border: solid 1px;
 }
@@ -11,21 +12,19 @@
   margin: 0 auto;
 }
 
+.modal-content {
+}
+
+.close-modal {
+}
+
 .editModal {
   position: relative;
 }
+
 .err-mess {
   color: red;
   font-size: 12px;
-}
-.modal {
-  position: sticky;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100px;
-  display: block;
-  background-color: #eeee;
 }
 
 .modal-content {
@@ -35,32 +34,6 @@
   justify-content: space-between;
 }
 
-
-.table-api {
-  display: grid;
-  grid-template-columns: 50px 200px auto  350px 100px;;
-}
-
-.table-api div {
-  padding: 5px;
-  border: solid 1px;
-}
-
-.edit {
-
-}
-
-.table-api {
-
-}
-
-
-#list-course {
-  display: flex;
-  flex-direction: column-reverse;
-}
-
-/* The Modal (background) */
 .modal {
   display: none; /* Hidden by default */
   position: fixed; /* Stay in place */
@@ -81,15 +54,15 @@
   margin: auto;
   padding: 20px;
   border: 1px solid #888;
-  width: 80%;
+  width: 60%;
 }
 
 /* The Close Button */
 .close {
   color: #aaaaaa;
-  float: right;
   font-size: 28px;
   font-weight: bold;
+  padding-right: 20px;
 }
 
 .close:hover,
@@ -98,7 +71,6 @@
   text-decoration: none;
   cursor: pointer;
 }
-
 
 
 
