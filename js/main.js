@@ -1,12 +1,15 @@
 const axios = require('axios').default;
+
 const avatarDefault = 'https://toppng.com/uploads/preview/roger-berry-avatar-placeholder-11562991561rbrfzlng6h.png'
+
 var api = 'https://satlegal.ebitc.com/api/dummies/groups'
+var api1 = 'https://satlegal.ebitc.com/api'
 
 var listPage = []
 
 const perPage = 20
 
-window.getApi = function getApi(page) {
+function getApi(page) {
   axios.get(api + `/?page=${page}`)
     .then(function (response) {
       listPage = [...response.data.results]
@@ -34,7 +37,7 @@ window.getApi = function getApi(page) {
     });
 }
 
-window.delGroup = function delGroup(id) {
+function delGroup(id) {
   if (window.confirm(`Delete ${id} ?`)) {
     axios.delete(api + '/' + id)
       .then(function (response) {
@@ -63,7 +66,7 @@ function getModal() {
   return modal
 }
 
-window.editGroup = function editGroup(id) {
+function editGroup(id) {
   var modal = getModal()
 
   modal.style.display = 'block'
@@ -103,13 +106,6 @@ function closeModal() {
   getModal().style.display = 'none'
 }
 
-window.onclick = function (event) {
-  if (event.target === getModal()) {
-    getModal().style.display = "none";
-  }
-}
-
-
 function clearInputValue() {
   document.querySelector('input[name = "name"]').value = ''
 }
@@ -139,7 +135,7 @@ function validate(name) {
   return name;
 }
 
-window.addGroup = function addGroup() {
+function addGroup() {
 
   var postData = getFieldValueOfForm()
 
@@ -195,11 +191,24 @@ function renderPagesGroup(totalPage, page) {
   document.querySelector('#pages-number').innerHTML = htmls
 }
 
-var listUsers = []
+function renderPagesUser(totalPage, page) {
+  if (totalPage === 1) {
+    return
+  }
+  var htmls = ''
+  for (var i = 1; i <= totalPage; i++) {
+    var cls = '' //disabledBtn
 
-window.run = function run() {
-  var idGroup = getGroupId()
-  getUser(idGroup)
+    if (page === i) {
+      cls = 'disabledBtn'
+    }
+    htmls += `<button class="${cls}" onclick="getUser(${i})"> Page ${i}</button>`
+  }
+  document.querySelector('#pages-number').innerHTML = htmls
+}
+
+function run() {
+  getUser(1)
 }
 
 function getGroupId() {
@@ -222,9 +231,7 @@ function initFakerOfForm() {
 
 }
 
-window.initFakerOfForm = initFakerOfForm
-
-window.previewImg = function previewImg() {
+function previewImg() {
   function readFile() {
     if (this.files && this.files[0]) {
       var FR = new FileReader();
@@ -251,12 +258,8 @@ window.previewImg = function previewImg() {
   document.getElementById("avatar1").addEventListener("change", readFile1, false);
 }
 
-
 function renderUsers(listUser) {
   var htmls = listUser.map(e => {
-    var strUser1 = "'21s'"
-    var strUser = '"' + JSON.stringify(e) + '"'
-    // strUser = strUser.toString()
     var srcAvatar = e.avatar ? e.avatar : ''
     return `<li>
 <h4> id : ${e.id}</h4>
@@ -269,22 +272,6 @@ function renderUsers(listUser) {
 </li>`
   })
   document.querySelector('#detail').innerHTML = htmls.join('')
-}
-
-function renderPagesUser(totalPage, page) {
-  if (totalPage === 1) {
-    return
-  }
-  var htmls = ''
-  for (var i = 1; i <= totalPage; i++) {
-    var cls = '' //disabledBtn
-
-    if (page === i) {
-      cls = 'disabledBtn'
-    }
-    htmls += `<button class="${cls}" onclick="getUser(${getGroupId()},${i})"> Page ${i}</button>`
-  }
-  document.querySelector('#pages-number').innerHTML = htmls
 }
 
 function checkEmpty(totalList) {
@@ -306,13 +293,14 @@ function addUser(evt) {
     .then(function (response) {
 
       var newUser = response.data
+      var l = getListUser()
 
-      listUsers.push(newUser)
+      l.push(newUser)
 
-      checkEmpty(listUsers.length)
+      checkEmpty(l.length)
 
-      renderUsers(listUsers)
-
+      renderUsers(l)
+      setListUser(l)
       removeMessErr()
 
       console.log(newUser);
@@ -328,13 +316,11 @@ function addUser(evt) {
         //removeMessErr first
         removeMessErr()
 
-        renderErrorOfForm(errors)
+        renderErrorOfForm(errors, 'err')
       }
     });
   return false
 }
-
-window.addUser = addUser;
 
 function renderErrorOfForm(errors, attrName = 'err') {
   var errkeys = Object.keys(errors) // [first_name]
@@ -378,20 +364,31 @@ function getFieldValueOfForm(attrName = 'data-field') {
   }
 }
 
-window.getUser = function getUser(idGroup, page = 1) {
-  axios.get(`https://satlegal.ebitc.com/api/dummies/groups/${idGroup}/users/?page=${page}`)
+function getListUser() {
+  var a = JSON.parse(localStorage.getItem('listUser'))
+  return a
+}
+
+function setListUser(results) {
+  localStorage.setItem('listUser', JSON.stringify(results))
+}
+
+function getUser(page = 1) {
+  axios.get(`https://satlegal.ebitc.com/api/dummies/groups/${getGroupId()}/users/?page=${page}`)
     .then(function (response) {
-      listUsers = [...response.data.results]
+      // listUsers = [...response.data.results]
+      //  listUsers = getListUser() || []
+      setListUser([...response.data.results])
 
       var totalPages = calcPagesNumber(response.data.count)
 
       renderPagesUser(totalPages, page)
 
-      checkEmpty(listUsers.length)
+      checkEmpty(getListUser().length)
 
-      renderUsers(listUsers)
+      renderUsers(getListUser())
 
-      console.log(listUsers)
+      console.log(getListUser())
     })
     .catch(function (error) {
       // handle error
@@ -401,23 +398,41 @@ window.getUser = function getUser(idGroup, page = 1) {
     });
 }
 
-window.delUser = function delUser(idGroup, idUser) {
-  if (window.confirm(`Delete User :  ${idUser} ?`)) {
+const $ = document
+
+function getCrrUser(id) {
+  var a = getListUser().find(e => {
+    return e.id === id
+  })
+  return a
+}
+
+function getCrrIndexUser(id) {
+  var a = getListUser().findIndex(e => {
+    return e.id === id
+  })
+  return a
+}
+
+function delUser(idGroup, idUser) {
+
+  var a = getCrrUser(idUser)
+
+  if (window.confirm(`Delete User :  ${a.first_name} ${a.last_name} ?`)) {
     axios.delete(`https://satlegal.ebitc.com/api/dummies/groups/${idGroup}/users/${idUser}`)
 
       .then(function (response) {
 
-        var indexId = listUsers.findIndex(e => {
-          return e.id === idUser
-        })
+        var indexId = getCrrIndexUser(idUser)
+        var l = getListUser()
+        l.splice(indexId, 1)
 
-        listUsers.splice(indexId, 1)
+        checkEmpty(l.length)
 
-        checkEmpty(listUsers.length)
+        renderUsers(l)
+        setListUser(l)
 
-        renderUsers(listUsers)
-
-        console.log(response)
+        console.log(a)
       })
       .catch(function (error) {
         console.log(error);
@@ -428,8 +443,9 @@ window.delUser = function delUser(idGroup, idUser) {
 var userEditSelected = null
 
 function showFormEdit(idGroup, idUser) {
-  var findUserEdit = listUsers.find(u => u.id === idUser)
-  userEditSelected = findUserEdit
+  var a = getCrrUser(idUser)
+
+  userEditSelected = a
   getModal().style.display = 'block'
 
   var allUpdateForm = document.querySelectorAll('[data-update]')
@@ -457,7 +473,6 @@ function showFormEdit(idGroup, idUser) {
     }
   })
   console.log(getGroupId(), userEditSelected.id)
-
 }
 
 function editUser() {
@@ -469,19 +484,17 @@ function editUser() {
 
       var newUser = response.data
 
-      var index = listUsers.findIndex(e => {
-        return e.id === userEditSelected.id
-      })
+      var index = getCrrIndexUser(userEditSelected.id)
+      var l = getListUser()
+      l[index] = newUser
+      setListUser(l)
+      checkEmpty(l.length)
 
-      listUsers[index] = newUser
-
-      checkEmpty(listUsers.length)
-
-      renderUsers(listUsers)
+      renderUsers(l)
 
       removeMessErr('errEdit')
 
-      console.log('aaa');
+      console.log(l);
 
     })
 
@@ -492,7 +505,7 @@ function editUser() {
 
         console.log(errors)
         //removeMessErr first
-        removeMessErr()
+        removeMessErr('errEdit')
 
         renderErrorOfForm(errors, 'errEdit')
       }
@@ -500,15 +513,24 @@ function editUser() {
   return false
 }
 
+window.onclick = function (event) {
+  if (event.target === getModal()) {
+    getModal().style.display = "none";
+  }
+}
+
+window.getApi = getApi
+window.editGroup = editGroup
+window.delGroup = delGroup
+window.addGroup = addGroup
+window.getUser = getUser
+window.delUser = delUser
+window.addUser = addUser;
 window.showFormEdit = showFormEdit
 window.editUser = editUser
-
-
-
-
-
-
-
+window.previewImg = previewImg
+window.initFakerOfForm = initFakerOfForm
+window.run = run
 
 
 
