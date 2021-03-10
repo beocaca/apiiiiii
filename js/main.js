@@ -408,7 +408,6 @@ async function addUser(evt) {
       renderErrorOfForm(errors, 'err')
     }
     console.log(error.response.data)
-
   }
   // return false
 }
