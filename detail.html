@@ -23,174 +23,100 @@
 
 <body>
 
-<div id="myModal" class="modal">
-  <div class="modal-content">
-    <form onsubmit="editUser() ;return false;" id="aaa">
-      <fieldset>
-        <legend>User Edit Form:</legend>
-        </br>
-        <label> First Name <span style="color: red">*</span> : </label>
-        <br/>
-        <input style="width: 100%" placeholder="15 chars" type="text"
-               data-update="first_name"
-               name="firstNameUser1"/>
-        <div class="err-mess">
-          <span errEdit="first_name"></span>
-        </div>
-        <div style="margin-bottom: 10px;"></div>
-        <label> Last Name <span style="color: red">*</span> : </label>
-        <br/>
-        <input style="width: 100%;" placeholder="15 chars" type="text"
-               data-update="last_name"
-               name="lastNameUser1"/>
-        <br/>
-        <div class="err-mess">
-          <span errEdit="last_name"></span>
-        </div>
-        <div style="margin-bottom: 10px;"></div>
-        <label> Email <span style="color: red">*</span> : </label>
-        <br/>
-        <input style="width: 100%;" type="email"
-               data-update="email"
-               name="emailUser1"/>
-        <div class="err-mess">
-          <span errEdit="email"></span>
-        </div>
-        <div style="margin-bottom: 10px;"></div>
 
-        <div> Avatar :
+<div class="main">
+  <div class="left">
+    <form onsubmit="return false;" form-name="user" id="form">
+      <fieldset>
+        <legend>User Form:</legend>
+        <div class="item-field">
+          <label> First Name <span style="color: red">*</span> : </label>
+          <input faker-attr="name.firstName"
+                 data-field="first_name"
+                 data-update="first_name"
+                 placeholder="15 chars" type="text" name="firstNameUser"/>
+          <div class="err-mess">
+            <span err="first_name"></span>
+          </div>
+        </div>
+        <div class="item-field">
+          <label> Last Name <span style="color: red">*</span> : </label>
+          <input faker-attr="name.lastName"
+                 data-field="last_name"
+                 data-update="last_name"
+                 placeholder="15 chars"
+                 type="text"
+                 name="lastNameUser"/>
+          <div class="err-mess">
+            <span err="last_name"></span>
+          </div>
+        </div>
+        <div class="item-field">
+          <label> Birthday <span style="color: red">*</span> : </label>
+          <input data-field="birthday"
+                 data-update="birthday"
+                 placeholder="YYYY-MM-DD"
+                 type="text" name="birthday"/>
+          <div class="err-mess">
+            <span err="birthday"></span>
+          </div>
+        </div>
+        <div class="item-field">
+          <label> Email <span style="color: red">*</span> : </label>
+          <input faker-attr="internet.exampleEmail"
+                 value="example@email.zxc"
+                 placeholder="example@email.zxc"
+                 data-update="email"
+                 data-field="email"
+                 type="email"/>
+          <div class="err-mess">
+            <span err="email"></span>
+          </div>
+        </div>
+        <div class="item-field">
+          Avatar :
           <div class="box-upload">
             <div class="hinh-mo-ta">
               <img src="https://toppng.com/uploads/preview/roger-berry-avatar-placeholder-11562991561rbrfzlng6h.png"
-                   mo-ta="avatar1"
+                   mo-ta="avatar"
                    data-image="avatar">
             </div>
             <input class="file-upload"
                    data-file-upload
-                   data-field="avatar1"
+                   data-field="avatar"
                    data-update="avatar"
+                   style="" type="file"
                    onchange="changeFileUpload(event)"
-                   style="" type="file" multiple name="avatarUser"/>
+                   multiple/>
+          </div>
+          <div class="err-mess">
+            <span err="avatar"></span>
           </div>
         </div>
-
-        <!-- <label for="avatar1" style="cursor:pointer;"> Avatar :
-           <img src="#"
-                style="-moz-border-radius: 50px;border-radius: 50px;height: 80px"
-                data-image="avatar"
-                id="imgupload1">
-
-           <div class="err-mess">
-             <span errEdit="avatar"></span>
-           </div>
-         </label>
-         <input class="hidden" style="" type="file" multiple id="avatar1"
-                data-file-upload
-                data-update="avatar"
-                name="avatarUser1"/>
-        -->
-        <br>
-
-        <input type="submit" value="Save">
-        <button onclick="closeModal()" type="button" class="close-modal"> Close</button>
-        <!--        <button type="button" onclick="initFakerOfForm()">Random User</button>-->
+        <div class="field-edit">
+          <div class="editGroup">
+            <button onclick="handleSaveEditUser()" type="button" value="Update Group">Update User</button>
+            <button onclick="cancelUpdate()" type="button" value="Update Group">Cancel Update
+            </button>
+          </div>
+          <div class="addGroup">
+            <button type="button" onclick="addUser()">Add User</button>
+          </div>
+          <button onclick="initFakerOfForm()" type="button"> Random User</button>
+        </div>
       </fieldset>
     </form>
-    <span onclick="closeModal()" class="close">&times;</span>
+  </div>
+  <div class="right">
+    <div id="pages-number">
+    </div>
+    <ul id="detail">
+    </ul>
+    <div id="empty">
+      Empty User
+    </div>
   </div>
 </div>
-<div style="padding: 20px; max-width: 400px; width: 100%;">
-  <form onsubmit="addUser(); return false;" id="xxxxx">
-    <fieldset>
-      <legend>User Form:</legend>
-      </br>
-      <label> First Name <span style="color: red">*</span> : </label>
-      <br/>
-      <div class="item-field">
-        <input faker-attr="name.firstName" data-field="first_name"
-
-               style="width: 100%" placeholder="15 chars" type="text" name="firstNameUser"/>
-
-        <div class="err-mess">
-          <span err="first_name"></span>
-        </div>
-        <div style="margin-bottom: 10px;"></div>
-
-        <label> Birthday <span style="color: red">*</span> : </label>
-        <br/>
-      </div>
-      <div class="item-field">
-        <input data-field="birthday"
-               placeholder="YYYY-MM-DD"
-               style="width: 100%" type="text" name="birthday"/>
-
-        <div class="err-mess">
-          <span err="birthday"></span>
-        </div>
-        <div style="margin-bottom: 10px;"></div>
-
-        <label> Last Name <span style="color: red">*</span> : </label>
-        <br/>
-      </div>
-
-      <!--      birthday-->
-      <input faker-attr="name.lastName" data-field="last_name" style="width: 100%;" placeholder="15 chars" type="text"
-             name="lastNameUser"/>
-      <br/>
-      <!--
-
-          <label> Full Name <span style="color: red">*</span> : </label>
-          <br/>
-          <input faker-attr="name.findName" style="width: 100%;" placeholder="15 chars" type="text" name="lastNameUfdsfdsser"/>
-      -->
-
-      <div class="err-mess">
-        <span err="last_name"></span>
-      </div>
-      <div style="margin-bottom: 10px;"></div>
-
-      <label> Email <span style="color: red">*</span> : </label>
-
-      <br/>
-
-      <input faker-attr="internet.exampleEmail" style="width: 100%;" value="example@email.zxc"
-             placeholder="example@email.zxc"
-             type="email" data-field="email"
-             name="emailUser"/>
-      <div class="err-mess">
-        <span err="email"></span>
-      </div>
-      <div style="margin-bottom: 10px;"></div>
-      <div> Avatar :
-        <div class="box-upload">
-          <div class="hinh-mo-ta">
-            <img src="https://toppng.com/uploads/preview/roger-berry-avatar-placeholder-11562991561rbrfzlng6h.png"
-                 mo-ta="avatar">
-          </div>
-          <input class="file-upload"
-                 data-field="avatar"
-                 onchange="changeFileUpload(event)"
-                 style="" type="file" multiple name="avatarUser"/>
-        </div>
-      </div>
-      <div class="err-mess">
-        <span err="avatar"></span>
-      </div>
-      <br>
-      <!--      <button id="addUser" type="submit">Add</button>-->
-      <input type="submit" value="Add">
-      <button type="button" onclick="initFakerOfForm()">Random User</button>
-
-    </fieldset>
-  </form>
-</div>
-<div id="pages-number">
-</div>
-<div id="empty" style="color: red;font-size: 50px;text-align: center">
-  Empty User
-</div>
-<ul id="detail">
-</ul>
 <script>
   window.onload = function () {
     initFakerOfForm()

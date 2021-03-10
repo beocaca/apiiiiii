@@ -84,7 +84,6 @@ async function handleSaveEditGroup() {
     var dataPost = getFieldValueOfForm('data-update')
     var dataPostFormData = dataPost.formData
     var response = await axios.put(endPoint, dataPostFormData)
-
     removeMessErr('errEditGroup')
     var list = getListLocal('listGroup')
     var index = list.findIndex(e => {
@@ -240,7 +239,6 @@ function initFakerOfForm() {
 }
 
 function changeFileUpload(evt) {
-  console.log(evt.target)
   let elm = evt.target //input
   let files = elm.files //input.files
   if (files && files[0]) {
@@ -253,7 +251,6 @@ function changeFileUpload(evt) {
     FR.readAsDataURL(files[0]);
   }
 }
-
 
 function previewImg() {
   function readFile() {
@@ -272,7 +269,7 @@ function previewImg() {
 
 function renderUsers(listUser) {
   var htmls = listUser.map(e => {
-    var srcAvatar = e.avatar ? e.avatar : ''
+    var srcAvatar = e.avatar ? e.avatar : `${avatarDefault}`
     return `<li>
 <h4> id : ${e.id}</h4>
 <div><img src="${srcAvatar}" alt=""></div>
@@ -280,7 +277,7 @@ function renderUsers(listUser) {
 <h2>Last Name : ${e.last_name} </a></h2>
 <h3>Email: ${e.email}</h3>
 <button onclick="delUser(${getGroupId()},${e.id})"> Del</button>
-<button type="button" onclick="showFormEdit(${getGroupId()},${e.id})"> Show Form Edit</button>
+<button type="button" onclick="showFormEdit(${getGroupId()},${e.id})"> Edit User </button>
 </li>`
   })
   document.querySelector('#detail').innerHTML = htmls.join('')
@@ -399,6 +396,10 @@ async function addUser(evt) {
     setListLocal('listUser', list)
     removeMessErr()
     console.log(list)
+    // form reset
+    document.getElementById('form').reset()
+    // avatar reset
+    resetAvatar()
   } catch (error) {
     if (error.response) {
       var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
@@ -411,6 +412,19 @@ async function addUser(evt) {
   }
   // return false
 }
+
+function resetAvatar() {
+  var allField = document.querySelectorAll('[data-field]')
+  allField.forEach(input => {
+    var attr = input.getAttribute('data-field')
+    if (input.files) {
+      document.querySelector(`[mo-ta= "${attr}"]`).src = avatarDefault
+    } else {
+
+    }
+  })
+}
+
 
 async function delUser(idGroup, idUser) {
   try {
@@ -432,13 +446,13 @@ async function delUser(idGroup, idUser) {
   }
 }
 
-//userEditSelected in showFormEdit
+//userEditSelected in showFormEdit+
+
 var userEditSelected = null
 
 function showFormEdit(idGroup, idUser) {
   userEditSelected = getCrrUser(idUser)
-  getModal().style.display = 'block'
-
+  document.querySelector('#form').classList.add('show')
   initFormValueWhenEdit(userEditSelected, 'data-update')
 }
 
@@ -469,7 +483,7 @@ function initFormValueWhenEdit(item, attrUpdate = 'data-update') {
   })
 }
 
-async function editUser() {
+async function handleSaveEditUser() {
   var postData = getFieldValueOfForm('data-update')
   var postDataFormData = postData.formData
   var endPoint = `${baseUrl}/dummies/groups/${getGroupId()}/users/${userEditSelected.id}/`
@@ -482,21 +496,22 @@ async function editUser() {
     setListLocal('listUser', list)
     checkEmpty(list.length)
     renderUsers(list)
-    removeMessErr('errEdit')
+    removeMessErr('err')
+    cancelUpdate()
+    resetAvatar()
     console.log(list)
   } catch (error) {
     if (error.response) {
       var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
       console.log(errors)
       //removeMessErr first
-      removeMessErr('errEdit')
-      renderErrorOfForm(errors, 'errEdit')
+      removeMessErr('err')
+      renderErrorOfForm(errors, 'err')
     }
   }
-  // return false
 }
 
-
+window.handleSaveEditUser = handleSaveEditUser
 window.changeFileUpload = changeFileUpload
 window.getGroup = getGroup
 window.editGroup = editGroup
@@ -506,7 +521,6 @@ window.getUser = getUser
 window.delUser = delUser
 window.addUser = addUser;
 window.showFormEdit = showFormEdit
-window.editUser = editUser
 // window.previewImg = previewImg
 window.initFakerOfForm = initFakerOfForm
 window.closeModal = closeModal

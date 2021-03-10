@@ -19,22 +19,22 @@
 </head>
 
 <body>
-<br>
 
 <div style="padding: 20px; max-width: 400px; width: 100%;">
   <form onsubmit="return false;" id="form" class="">
     <fieldset>
       <legend>Groups Form:</legend>
-
       <div class="field-item">
         <label> Name Group <span style="color: #ff0000">*</span> : </label>
-        <input class="" faker-attr="company.companyName" data-field="name" data-update="name"
+        <input class="" faker-attr="company.companyName"
+               data-field="name"
+               data-update="name"
                placeholder="15 chars" type="text" name="name"/>
         <div class="err-mess">
           <span err="name" errEditGroup="name"></span>
         </div>
       </div>
-      <div class="field-eidt">
+      <div class="field-edit">
         <div class="editGroup">
           <button type="button" onclick="handleSaveEditGroup()" value="Update Group">Update Group</button>
           <button type="button" onclick="cancelUpdate()" value="Update Group">Cancel Update</button>
@@ -46,16 +46,17 @@
       </div>
     </fieldset>
   </form>
-
 </div>
-<div id="pages-number">
+<div>
+  <div id="pages-number">
 
-</div>
-<ul id="group-block">
+  </div>
+  <ul id="group-block">
 
-</ul>
-<div id="empty" style="color: red;font-size: 50px;text-align: center">
-  Empty User
+  </ul>
+  <div id="empty" style="color: red;font-size: 50px;text-align: center">
+    Empty User
+  </div>
 </div>
 <script>
   window.onload = function () {
