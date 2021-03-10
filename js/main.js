@@ -84,16 +84,18 @@ async function handleSaveEditGroup() {
     var dataPost = getFieldValueOfForm('data-update')
     var dataPostFormData = dataPost.formData
     var response = await axios.put(endPoint, dataPostFormData)
+
     removeMessErr('errEditGroup')
     var list = getListLocal('listGroup')
     var index = list.findIndex(e => {
-      return e.id === groupId
+      return e.id == `${groupId}`
     })
     list[index] = response.data
     checkEmpty(list.length)
     renderPage(list)
     setListLocal('listGroup', list)
     console.log(list)
+    cancelUpdate()
   } catch (error) {
     if (error.response) {
       var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
@@ -107,18 +109,24 @@ async function handleSaveEditGroup() {
 
 window.handleSaveEditGroup = handleSaveEditGroup
 
+window.cancelUpdate = function cancelUpdate() {
+  document.querySelector('#form').classList.remove('show')
+  document.getElementById('form').reset()
+}
+
 function editGroup(id) {
   // todo: 1 open modal
-  var modal = getModal()
-  modal.style.display = 'block'
+  /*var modal = getModal()
+  modal.style.display = 'block'*/
+  document.querySelector('#form').classList.add('show')
 
   // todo: 2 init value form
-  groupId = id
+  groupId = `${id}`
   var list = getListLocal('listGroup')
-  var groupSelected = list.find(e => {
-    return e.id === id
+  var groupEditSelected = list.find(e => {
+    return e.id == `${id}`
   })
-  initFormValueWhenEdit(groupSelected, 'data-update')
+  initFormValueWhenEdit(groupEditSelected, 'data-update')
 }
 
 function getModal() {
@@ -345,9 +353,10 @@ async function getUser(page = 1) {
     setListLocal('listUser', [...response.data.results])
     var totalPages = calcPagesNumber(response.data.count)
     renderPagesUser(totalPages, page)
-    checkEmpty(getListLocal('listUser').length)
-    renderUsers(getListLocal('listUser'))
-    console.error('RESPONSE', response)
+    var list = getListLocal('listUser')
+    checkEmpty(list.length)
+    renderUsers(list)
+    console.log(list)
   } catch (err) {
     console.error(err.message)
   } finally {
@@ -362,14 +371,13 @@ async function addUser(evt) {
   try {
     var response = await axios.post(endPoint, dataPostFormData)
     var newUser = response.data
-    var l = getListLocal('listUser')
-    l.push(newUser)
-    checkEmpty(l.length)
-    renderUsers(l)
-    setListLocal('listUser', l)
+    var list = getListLocal('listUser')
+    list.push(newUser)
+    checkEmpty(list.length)
+    renderUsers(list)
+    setListLocal('listUser', list)
     removeMessErr()
-    console.log(newUser);
-    console.error('RESPONSE', response)
+    console.log(list)
   } catch (error) {
     if (error.response) {
       var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
@@ -385,17 +393,16 @@ async function addUser(evt) {
 async function delUser(idGroup, idUser) {
   try {
     var endPoint = `${baseUrl}/dummies/groups/${idGroup}/users/${idUser}`
-    var a = getCrrUser(idUser)
-    if (window.confirm(`Delete User :  ${a.first_name} ${a.last_name} ?`)) {
+    var crrUser = getCrrUser(idUser)
+    if (window.confirm(`Delete User :  ${crrUser.first_name} ${crrUser.last_name} ?`)) {
       var response = await axios.delete(endPoint)
       var indexId = getCrrIndexUser(idUser)
-      var l = getListLocal('listUser')
-      l.splice(indexId, 1)
-      checkEmpty(l.length)
-      renderUsers(l)
-      setListLocal('listUser', l)
-      console.error('a', a)
-      console.error('RESPONSE', response)
+      var list = getListLocal('listUser')
+      list.splice(indexId, 1)
+      checkEmpty(list.length)
+      renderUsers(list)
+      setListLocal('listUser', list)
+      console.log(list)
     }
   } catch (err) {
     console.log(err);
@@ -418,7 +425,7 @@ function initFormValueWhenEdit(item, attrUpdate = 'data-update') {
 
   allUpdateForm.forEach(elm => {
 
-    var fieldName = elm.getAttribute(attrUpdate)
+    var fieldName = elm.getAttribute(`${attrUpdate}`)
 
     var isFieldFileUpload = elm.hasAttribute('data-file-upload') // if file upload boolean
     if (isFieldFileUpload) { //neu co attributes data-file-upload thi lam
@@ -448,13 +455,13 @@ async function editUser() {
     var response = await axios.put(endPoint, postDataFormData)
     var newUser = response.data
     var index = getCrrIndexUser(userEditSelected.id)
-    var l = getListLocal('listUser')
-    l[index] = newUser
-    setListLocal('listUser', l)
-    checkEmpty(l.length)
-    renderUsers(l)
+    var list = getListLocal('listUser')
+    list[index] = newUser
+    setListLocal('listUser', list)
+    checkEmpty(list.length)
+    renderUsers(list)
     removeMessErr('errEdit')
-    console.error('RESPONSE', response)
+    console.error(list)
   } catch (error) {
     if (error.response) {
       var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}

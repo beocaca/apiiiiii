@@ -21,36 +21,25 @@
 <body>
 <br>
 
-<div id="myModal" class="modal">
-  <!-- Modal content -->
-  <div class="modal-content">
-    <form onsubmit="return false" id="formEditGroup">
-      <div>
-        <label> Name Group <span style="color: red">*</span> : </label>
-        <input type="text" data-update="name">
-        <div class="err-mess">
-          <span errEditGroup="name"></span>
-        </div>
-      </div>
-      <button type="button" onclick="handleSaveEditGroup()"> SAVE</button>
-      <button type="button" onclick="closeModal()"> Close</button>
-    </form>
-  </div>
-</div>
-
 <div style="padding: 20px; max-width: 400px; width: 100%;">
-  <form onsubmit="addGroup(); return false;" id="aaa">
+  <form onsubmit="return false;" id="form" class="">
     <fieldset>
       <legend>Groups Form:</legend>
       </br>
       <label> Name Group <span style="color: #ff0000">*</span> : </label>
       <br/>
-      <input faker-attr="company.companyName" data-field="name"
-             style="width: 100%" placeholder="15 chars" type="text" name="name"/>
+      <input class="" faker-attr="company.companyName" data-field="name" data-update="name"
+             placeholder="15 chars" type="text" name="name"/>
       <div class="err-mess">
-        <span err="name"></span>
+        <span err="name" errEditGroup="name"></span>
       </div>
-      <input type="submit" value="Add Group">
+      <div class="editGroup">
+        <button type="button" onclick="handleSaveEditGroup()" value="Update Group">Update Group</button>
+        <button type="button" onclick="cancelUpdate()" value="Update Group">Cancel Update</button>
+      </div>
+      <div class="addGroup">
+        <button type="button" onclick="addGroup()" value="Update Group">Add Group</button>
+      </div>
       <button onclick="initFakerOfForm()" type="button"> Random Name</button>
     </fieldset>
   </form>

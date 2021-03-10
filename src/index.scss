@@ -72,6 +72,27 @@
   cursor: pointer;
 }
 
+#form {
+
+  &.show {
+    .editGroup {
+      display: block;
+    }
+
+    .addGroup {
+      display: none;
+    }
+  }
+
+  .editGroup {
+    display: none;
+  }
+
+  input {
+    width: 90%;
+  }
+
+}
 
 
 
