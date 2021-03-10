@@ -57,21 +57,40 @@
           <span errEdit="email"></span>
         </div>
         <div style="margin-bottom: 10px;"></div>
-        <label for="avatar1" style="cursor:pointer;"> Avatar :
-          <img src="#"
-               style="-moz-border-radius: 50px;border-radius: 50px;height: 80px"
-               data-image="avatar"
-               id="imgupload1">
 
-          <div class="err-mess">
-            <span errEdit="avatar"></span>
+        <div> Avatar :
+          <div class="box-upload">
+            <div class="hinh-mo-ta">
+              <img src="https://toppng.com/uploads/preview/roger-berry-avatar-placeholder-11562991561rbrfzlng6h.png"
+                   mo-ta="avatar1"
+                   data-image="avatar">
+            </div>
+            <input class="file-upload"
+                   data-file-upload
+                   data-field="avatar1"
+                   data-update="avatar"
+                   onchange="changeFileUpload(event)"
+                   style="" type="file" multiple name="avatarUser"/>
           </div>
-        </label>
-        <input class="hidden" style="" type="file" multiple id="avatar1"
-               data-file-upload
-               data-update="avatar"
-               name="avatarUser1"/>
+        </div>
+
+        <!-- <label for="avatar1" style="cursor:pointer;"> Avatar :
+           <img src="#"
+                style="-moz-border-radius: 50px;border-radius: 50px;height: 80px"
+                data-image="avatar"
+                id="imgupload1">
+
+           <div class="err-mess">
+             <span errEdit="avatar"></span>
+           </div>
+         </label>
+         <input class="hidden" style="" type="file" multiple id="avatar1"
+                data-file-upload
+                data-update="avatar"
+                name="avatarUser1"/>
+        -->
         <br>
+
         <input type="submit" value="Save">
         <button onclick="closeModal()" type="button" class="close-modal"> Close</button>
         <!--        <button type="button" onclick="initFakerOfForm()">Random User</button>-->
@@ -142,14 +161,18 @@
         <span err="email"></span>
       </div>
       <div style="margin-bottom: 10px;"></div>
-      <label for="avatar" style="cursor:pointer;"> Avatar :
-        <img src="https://toppng.com/uploads/preview/roger-berry-avatar-placeholder-11562991561rbrfzlng6h.png"
-             style="-moz-border-radius: 50px;border-radius: 50px;height: 80px"
-             id="imgupload">
-      </label>
-
-      <input class="hidden" data-field="avatar"
-             style="" type="file" multiple id="avatar" name="avatarUser"/>
+      <div> Avatar :
+        <div class="box-upload">
+          <div class="hinh-mo-ta">
+            <img src="https://toppng.com/uploads/preview/roger-berry-avatar-placeholder-11562991561rbrfzlng6h.png"
+                 mo-ta="avatar">
+          </div>
+          <input class="file-upload"
+                 data-field="avatar"
+                 onchange="changeFileUpload(event)"
+                 style="" type="file" multiple name="avatarUser"/>
+        </div>
+      </div>
       <div class="err-mess">
         <span err="avatar"></span>
       </div>
@@ -171,8 +194,7 @@
 <script>
   window.onload = function () {
     initFakerOfForm()
-    previewImg()
-    run()
+    getUser(1)
   }
 </script>
 

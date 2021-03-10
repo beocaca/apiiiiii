@@ -25,22 +25,25 @@
   <form onsubmit="return false;" id="form" class="">
     <fieldset>
       <legend>Groups Form:</legend>
-      </br>
-      <label> Name Group <span style="color: #ff0000">*</span> : </label>
-      <br/>
-      <input class="" faker-attr="company.companyName" data-field="name" data-update="name"
-             placeholder="15 chars" type="text" name="name"/>
-      <div class="err-mess">
-        <span err="name" errEditGroup="name"></span>
+
+      <div class="field-item">
+        <label> Name Group <span style="color: #ff0000">*</span> : </label>
+        <input class="" faker-attr="company.companyName" data-field="name" data-update="name"
+               placeholder="15 chars" type="text" name="name"/>
+        <div class="err-mess">
+          <span err="name" errEditGroup="name"></span>
+        </div>
       </div>
-      <div class="editGroup">
-        <button type="button" onclick="handleSaveEditGroup()" value="Update Group">Update Group</button>
-        <button type="button" onclick="cancelUpdate()" value="Update Group">Cancel Update</button>
+      <div class="field-eidt">
+        <div class="editGroup">
+          <button type="button" onclick="handleSaveEditGroup()" value="Update Group">Update Group</button>
+          <button type="button" onclick="cancelUpdate()" value="Update Group">Cancel Update</button>
+        </div>
+        <div class="addGroup">
+          <button type="button" onclick="addGroup()" value="Update Group">Add Group</button>
+        </div>
+        <button onclick="initFakerOfForm()" type="button"> Random Name</button>
       </div>
-      <div class="addGroup">
-        <button type="button" onclick="addGroup()" value="Update Group">Add Group</button>
-      </div>
-      <button onclick="initFakerOfForm()" type="button"> Random Name</button>
     </fieldset>
   </form>
 

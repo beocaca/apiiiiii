@@ -208,9 +208,6 @@ function renderPagesUser(totalPage, page) {
   document.querySelector('#pages-number').innerHTML = htmls
 }
 
-function run() {
-  getUser(1)
-}
 
 function getGroupId() {
   var url = new URL(location.href)
@@ -218,7 +215,7 @@ function getGroupId() {
   return idGroup
 }
 
-function initFakerOfForm() {
+/*function initFakerOfForm() {
   var allInput = document.querySelectorAll('[faker-attr]')
   allInput.forEach(input => {
     var attr = input.getAttribute('faker-attr')
@@ -228,8 +225,35 @@ function initFakerOfForm() {
     var value = faker[firstKey][lastKey]()
     input.value = value
   })
+}*/
 
+function initFakerOfForm() {
+  var allInput = document.querySelectorAll('[faker-attr]')
+  allInput.forEach(input => {
+    var attr = input.getAttribute('faker-attr')
+    var arr = attr.split('.')
+    var firstKey = arr[0]// => a['name']
+    var lastKey = arr[1]
+    var value = faker[arr[0]][arr[1]]()
+    input.value = value
+  })
 }
+
+function changeFileUpload(evt) {
+  console.log(evt.target)
+  let elm = evt.target //input
+  let files = elm.files //input.files
+  if (files && files[0]) {
+    var FR = new FileReader();
+    FR.onload = function (e) {
+      var attrImage = elm.getAttribute('data-field')
+      var elmImage = document.querySelector(`[mo-ta=${attrImage}]`)
+      elmImage.src = e.target.result;
+    };
+    FR.readAsDataURL(files[0]);
+  }
+}
+
 
 function previewImg() {
   function readFile() {
@@ -243,19 +267,7 @@ function previewImg() {
     }
   }
 
-  function readFile1() {
-    if (this.files && this.files[0]) {
-      var FR = new FileReader();
-      FR.onload = function (e) {
-        document.getElementById("imgupload1").style.width = "80px";
-        document.getElementById("imgupload1").src = e.target.result;
-      };
-      FR.readAsDataURL(this.files[0]);
-    }
-  }
-
   document.getElementById("avatar").addEventListener("change", readFile, false);
-  document.getElementById("avatar1").addEventListener("change", readFile1, false);
 }
 
 function renderUsers(listUser) {
@@ -291,7 +303,7 @@ function renderErrorOfForm(errors, attrName = 'err') {
 
 function removeMessErr(attrErrName = 'err') {
   var allMess = document.querySelectorAll(`[${attrErrName}]`)
-  allMess.forEach(elm => elm.textContent = '')
+  allMess.forEach(elm => elm.textContent = null)
 }
 
 function getFieldValueOfForm(attrName = 'data-field') {
@@ -302,14 +314,24 @@ function getFieldValueOfForm(attrName = 'data-field') {
 
   allFieldElm.forEach(elmInput => {
     var fieldName = elmInput.getAttribute(`${attrName}`)
+    // var isFileUpload = elmInput.getAttribute('is-file-upload')
 
-    if (elmInput.files) {
+    var isFileUpload1 = elmInput.files
+
+    if (isFileUpload1) { // la input type=file
+      /*<input class="hidden" style="" type="file" multiple id="avatar1"
+               data-file-upload
+               data-update="avatar"
+               name="avatarUser1"/>*/
       var arrFiles = Object.values(elmInput.files)
       for (var i = 0; i < arrFiles.length; i++) {
         jsonData[fieldName] = arrFiles[i]
         formData.append([fieldName], arrFiles[i])
       }
-    } else {
+    } else { // input type=text,number,date,date-timelocal,...
+      /*<input style="width: 100%;" type="email"
+               data-update="email"
+               name="emailUser1"/>*/
       var fieldValue = elmInput.value
       jsonData[fieldName] = fieldValue
       formData.append([fieldName], fieldValue)
@@ -359,7 +381,6 @@ async function getUser(page = 1) {
     console.log(list)
   } catch (err) {
     console.error(err.message)
-  } finally {
   }
 }
 
@@ -381,11 +402,12 @@ async function addUser(evt) {
   } catch (error) {
     if (error.response) {
       var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
-      console.log(errors)
       //removeMessErr first
       removeMessErr()
       renderErrorOfForm(errors, 'err')
     }
+    console.log(error.response.data)
+
   }
   // return false
 }
@@ -461,7 +483,7 @@ async function editUser() {
     checkEmpty(list.length)
     renderUsers(list)
     removeMessErr('errEdit')
-    console.error(list)
+    console.log(list)
   } catch (error) {
     if (error.response) {
       var errors = error.response.data // {first_name: ['loi 1', 'loi 2']}
@@ -474,6 +496,8 @@ async function editUser() {
   // return false
 }
 
+
+window.changeFileUpload = changeFileUpload
 window.getGroup = getGroup
 window.editGroup = editGroup
 window.delGroup = delGroup
@@ -483,10 +507,9 @@ window.delUser = delUser
 window.addUser = addUser;
 window.showFormEdit = showFormEdit
 window.editUser = editUser
-window.previewImg = previewImg
+// window.previewImg = previewImg
 window.initFakerOfForm = initFakerOfForm
 window.closeModal = closeModal
-window.run = run
 
 
 
