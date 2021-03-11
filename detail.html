@@ -33,7 +33,6 @@
           <label> First Name <span style="color: red">*</span> : </label>
           <input faker-attr="name.firstName"
                  data-field="first_name"
-                 data-update="first_name"
                  placeholder="15 chars" type="text" name="firstNameUser"/>
           <div class="err-mess">
             <span err="first_name"></span>
@@ -43,7 +42,6 @@
           <label> Last Name <span style="color: red">*</span> : </label>
           <input faker-attr="name.lastName"
                  data-field="last_name"
-                 data-update="last_name"
                  placeholder="15 chars"
                  type="text"
                  name="lastNameUser"/>
@@ -54,7 +52,6 @@
         <div class="item-field">
           <label> Birthday <span style="color: red">*</span> : </label>
           <input data-field="birthday"
-                 data-update="birthday"
                  placeholder="YYYY-MM-DD"
                  type="text" name="birthday"/>
           <div class="err-mess">
@@ -66,7 +63,6 @@
           <input faker-attr="internet.exampleEmail"
                  value="example@email.zxc"
                  placeholder="example@email.zxc"
-                 data-update="email"
                  data-field="email"
                  type="email"/>
           <div class="err-mess">
@@ -78,13 +74,11 @@
           <div class="box-upload">
             <div class="hinh-mo-ta">
               <img src="https://toppng.com/uploads/preview/roger-berry-avatar-placeholder-11562991561rbrfzlng6h.png"
-                   mo-ta="avatar"
-                   data-image="avatar">
+                   mo-ta="avatar">
             </div>
+            <!--            data-file-upload-->
             <input class="file-upload"
-                   data-file-upload
                    data-field="avatar"
-                   data-update="avatar"
                    style="" type="file"
                    onchange="changeFileUpload(event)"
                    multiple/>

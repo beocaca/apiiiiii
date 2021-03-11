@@ -3,6 +3,10 @@
   opacity: 0.4;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 #api {
   border: solid 1px;
 }
@@ -143,6 +147,12 @@
 
       li {
         list-style: none;
+        display: grid;
+
+        div, h1, h2, h3, h4, h5 {
+          padding: 0;
+          margin: 10px;
+        }
       }
 
       img {
@@ -156,6 +166,9 @@
   }
 }
 
+.selected {
+  border: solid red 1px;
+}
 
 
 

@@ -125,7 +125,7 @@ function editGroup(id) {
   var groupEditSelected = list.find(e => {
     return e.id == `${id}`
   })
-  initFormValueWhenEdit(groupEditSelected, 'data-update')
+  initFormValueWhenEdit(groupEditSelected, 'data-field')
 }
 
 function getModal() {
@@ -275,9 +275,11 @@ function renderUsers(listUser) {
 <div><img src="${srcAvatar}" alt=""></div>
 <h2>First Name : ${e.first_name} </a></h2>
 <h2>Last Name : ${e.last_name} </a></h2>
-<h3>Email: ${e.email}</h3>
+<h3 >Email: ${e.email}</h3>
+<div>
 <button onclick="delUser(${getGroupId()},${e.id})"> Del</button>
-<button type="button" onclick="showFormEdit(${getGroupId()},${e.id})"> Edit User </button>
+<button type="button" onclick="showFormEdit(${getGroupId()},${e.id},event)"> Edit User </button>
+</div>
 </li>`
   })
   document.querySelector('#detail').innerHTML = htmls.join('')
@@ -429,9 +431,9 @@ async function delUser(idGroup, idUser) {
   try {
     var endPoint = `${baseUrl}/dummies/groups/${idGroup}/users/${idUser}`
     var crrUser = getCrrUser(idUser)
+    var indexId = getCrrIndexUser(idUser)
     if (window.confirm(`Delete User :  ${crrUser.first_name} ${crrUser.last_name} ?`)) {
       var response = await axios.delete(endPoint)
-      var indexId = getCrrIndexUser(idUser)
       var list = getListLocal('listUser')
       list.splice(indexId, 1)
       checkEmpty(list.length)
@@ -449,41 +451,15 @@ async function delUser(idGroup, idUser) {
 
 var userEditSelected = null
 
-function showFormEdit(idGroup, idUser) {
+function showFormEdit(idGroup, idUser, e) {
   userEditSelected = getCrrUser(idUser)
   document.querySelector('#form').classList.add('show')
-  initFormValueWhenEdit(userEditSelected, 'data-update')
-}
-
-function initFormValueWhenEdit(item, attrUpdate = 'data-update') {
-  var allUpdateForm = document.querySelectorAll(`[${attrUpdate}]`)
-
-  allUpdateForm.forEach(elm => {
-
-    var fieldName = elm.getAttribute(`${attrUpdate}`)
-
-    var isFieldFileUpload = elm.hasAttribute('data-file-upload') // if file upload boolean
-    if (isFieldFileUpload) { //neu co attributes data-file-upload thi lam
-      if (document.querySelector(`[data-image=${fieldName}]`)) {
-        //neu co phan mo ta thi moi add SRC dc
-        //<img src = '...'>
-        //file .doc .exl ko add SRC
-        if (item[fieldName]) { //user[fieldName] KHONG la NULL ????
-          document.querySelector(`[data-image=${fieldName}]`).src = item[fieldName]
-        } else {
-          //khi show phai show 1 trong 2
-          //show 1 hoac 2 se ko get dc 1 trong 2
-          document.querySelector(`[data-image=${fieldName}]`).src = avatarDefault
-        }
-      }
-    } else {
-      elm.value = item[fieldName]
-    }
-  })
+  initFormValueWhenEdit(userEditSelected, 'data-field')
+  console.log(userEditSelected)
 }
 
 async function handleSaveEditUser() {
-  var postData = getFieldValueOfForm('data-update')
+  var postData = getFieldValueOfForm('data-field')
   var postDataFormData = postData.formData
   var endPoint = `${baseUrl}/dummies/groups/${getGroupId()}/users/${userEditSelected.id}/`
   try {
@@ -509,6 +485,36 @@ async function handleSaveEditUser() {
     }
   }
 }
+
+
+function initFormValueWhenEdit(item, attrUpdate = 'data-field') {
+  var allUpdateForm = document.querySelectorAll(`[${attrUpdate}]`)
+
+  allUpdateForm.forEach(elm => {
+
+    var fieldName = elm.getAttribute(`${attrUpdate}`)
+
+    // var isFieldFileUpload = elm.hasAttribute('data-file-upload') // if file upload boolean
+    var isFieldFileUpload = elm.files
+    if (isFieldFileUpload) { //neu co attributes data-file-upload thi lam
+      if (document.querySelector(`[mo-ta=${fieldName}]`)) {
+        //neu co phan mo ta thi moi add SRC dc
+        //<img src = '...'>
+        //file .doc .exl ko add SRC
+        if (item[fieldName]) { //user[fieldName] KHONG la NULL ????
+          document.querySelector(`[mo-ta=${fieldName}]`).src = item[fieldName]
+        } else {
+          //khi show phai show 1 trong 2
+          //show 1 hoac 2 se ko get dc 1 trong 2
+          document.querySelector(`[mo-ta=${fieldName}]`).src = avatarDefault
+        }
+      }
+    } else {
+      elm.value = item[fieldName]
+    }
+  })
+}
+
 
 window.handleSaveEditUser = handleSaveEditUser
 window.changeFileUpload = changeFileUpload
